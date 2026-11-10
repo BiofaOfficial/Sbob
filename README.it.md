@@ -27,15 +27,22 @@ servizi esterni.
 - **Storico permanente** ed export in **PDF** e **Markdown**.
 - Interfaccia e prodotti in **italiano e inglese**.
 
-## Requisiti
+## Cosa serve
 
-- Mac con chip Apple (M1 o successivi), **macOS 14 Sonoma** o successivo.
-- **16 GB** di memoria minimo; consigliati **24 GB** o più.
-- Circa **20 GB liberi** su disco per i modelli.
+Sbob fa tutto il lavoro sul tuo computer, quindi gliene serve uno abbastanza recente. Se hai un Mac
+degli ultimi anni, o un buon PC con Ubuntu, quasi certamente sei a posto.
 
-Linux e Windows (con scheda NVIDIA) arriveranno nelle prossime versioni.
+<p align="center"><img src="docs/img/requirements.it.svg" alt="Un Mac con chip Apple (M1 o successivo, macOS 14+) oppure un PC con Ubuntu 22.04+ (scheda NVIDIA facoltativa); 16 GB di memoria; 20-30 GB di spazio libero; internet solo per installare" width="860"></p>
+
+Non sei sicuro del tuo computer? Lancia l'installer: prima controlla tutto e ti dice in parole
+semplici se manca qualcosa. Su un PC senza scheda NVIDIA Sbob funziona lo stesso, ci mette solo di
+più (l'installer sceglie da solo un modello più leggero).
+
+Windows arriverà più avanti.
 
 ## Installazione
+
+### Mac
 
 1. Scarica Sbob: da GitHub con **Code → Download ZIP** (poi scompatta), oppure
    `git clone https://github.com/BiofaOfficial/Sbob.git`. Metti la cartella dove vuoi, per esempio in *Download*.
@@ -57,15 +64,28 @@ e [pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0).
 **Per aggiornare**: scarica la nuova versione e rilancia `./install.sh` dalla sua cartella. Lo
 storico non si tocca.
 
+### Linux (Ubuntu 22.04 o successivo)
+
+Stessi passi, ma il comando è:
+
+```
+./install-linux.sh
+```
+
+Sbob compare nel menu delle applicazioni e sulla Scrivania. Chiede la password solo per installare
+i pacchetti di sistema. Se c'è una scheda NVIDIA con i driver installati (`nvidia-smi` funziona) la
+usa da solo. Il supporto a Linux è recente: se qualcosa non va,
+[apri una segnalazione](https://github.com/BiofaOfficial/Sbob/issues).
+
 ## Uso
 
 1. Doppio clic su **Sbob** sulla Scrivania (o in Applicazioni): si apre il browser. Sbob lavora in
    sottofondo; per chiuderlo usa **Esci** in fondo alla barra a sinistra.
 2. **Nuovo** → trascina il file (o incolla il link) → scegli il profilo → scegli il corso → **Avvia**.
-3. Puoi chiudere il browser: il lavoro continua e il Mac non va in stop finché non ha finito.
+3. Puoi chiudere il browser: il lavoro continua e il computer non va in stop finché non ha finito.
    Riapri Sbob per vedere il risultato.
 
-Per un'ora di lezione servono indicativamente 15-30 minuti, secondo il Mac.
+Per un'ora di lezione servono indicativamente 15-30 minuti su Mac o con una scheda NVIDIA; sensibilmente di più con la sola CPU.
 
 ## Guida
 
@@ -79,7 +99,7 @@ Tutto è nella cartella **`~/Sbob`** della tua utenza:
 - `lavori/`: le registrazioni e l'audio estratto;
 - `config.toml`: le impostazioni (contiene il token di Hugging Face, se l'hai inserito).
 
-Per fare il backup, o per spostare lo storico su un altro Mac, basta copiare la cartella.
+Per fare il backup, o per spostare lo storico su un altro computer, basta copiare la cartella.
 
 ## Uso responsabile
 
@@ -91,7 +111,7 @@ Per fare il backup, o per spostare lo storico su un altro Mac, basta copiare la 
 
 | Componente | Uso | Licenza |
 |---|---|---|
-| [mlx-whisper](https://github.com/ml-explore/mlx-examples) e il modello Whisper di OpenAI | trascrizione | MIT |
+| [mlx-whisper](https://github.com/ml-explore/mlx-examples) (Mac), [faster-whisper](https://github.com/SYSTRAN/faster-whisper) (Linux) e il modello Whisper di OpenAI | trascrizione | MIT |
 | [Ollama](https://ollama.com) | esecuzione locale dell'LLM | MIT |
 | [Qwen2.5](https://huggingface.co/Qwen) (modello predefinito) | sintesi | Apache 2.0 |
 | [pyannote.audio](https://github.com/pyannote/pyannote-audio) | separazione voci | MIT; i modelli sono **«gated»**: vanno accettate le condizioni su Hugging Face |
@@ -106,7 +126,7 @@ Per fare il backup, o per spostare lo storico su un altro Mac, basta copiare la 
 ```
 ./sbob-dev.sh test     # test con motori finti (funzionano anche su Linux)
 ./sbob-dev.sh lint     # controllo del codice con ruff
-./sbob-dev.sh check    # verifica i motori veri su un Mac
+./sbob-dev.sh check    # verifica i motori veri su questo computer
 ./sbob-dev.sh run      # avvia dal sorgente
 ./sbob-dev.sh build    # ricompila il frontend (serve Node)
 ./sbob-dev.sh pacchetto [minor|major]   # nuova release

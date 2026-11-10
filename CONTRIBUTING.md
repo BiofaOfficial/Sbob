@@ -10,7 +10,7 @@ Tests use fake engines, so they run on Linux and on any Mac without downloading 
 ```
 ./sbob-dev.sh test     # pytest
 ./sbob-dev.sh lint     # ruff
-./sbob-dev.sh run      # run from source (Apple Silicon, real engines)
+./sbob-dev.sh run      # run from source with the real engines (Apple Silicon or Linux)
 ./sbob-dev.sh build    # rebuild the frontend into sbob/static
 uvx pre-commit install # optional: ruff + secret scan before each commit
 ```

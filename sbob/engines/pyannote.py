@@ -1,4 +1,4 @@
-"""Separazione delle voci con pyannote (da diar_service.py), su MPS con ripiego CPU."""
+"""Separazione delle voci con pyannote su GPU (MPS su Mac, CUDA su Linux) con ripiego sulla CPU."""
 from __future__ import annotations
 
 import contextlib
@@ -30,11 +30,12 @@ class SeparatorePyannote:
             pipe = Pipeline.from_pretrained(MODELLO, use_auth_token=tok)
         if pipe is None:
             raise RuntimeError("Accesso al modello pyannote non concesso: accetta la licenza su Hugging Face")
-        if torch.backends.mps.is_available():
+        gpu = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else None
+        if gpu:
             try:
-                pipe.to(torch.device("mps"))
+                pipe.to(torch.device(gpu))
             except Exception as e:
-                log.warning("MPS non utilizzabile, uso la CPU: %s", e)
+                log.warning("GPU (%s) non utilizzabile, uso la CPU: %s", gpu, e)
         self._pipe = pipe
         return pipe
 
@@ -49,8 +50,8 @@ class SeparatorePyannote:
         dati = torch.from_numpy(np.frombuffer(raw, dtype=np.int16).astype("float32") / 32768.0).unsqueeze(0)
         try:
             out = pipe({"waveform": dati, "sample_rate": sr})
-        except Exception as e:  # operazioni non supportate su MPS → CPU
-            log.warning("Separazione su MPS fallita (%s), ripeto sulla CPU", e)
+        except Exception as e:  # operazioni non supportate o memoria video esaurita → CPU
+            log.warning("Separazione sulla GPU fallita (%s), ripeto sulla CPU", e)
             pipe.to(torch.device("cpu"))
             out = pipe({"waveform": dati, "sample_rate": sr})
         ann = getattr(out, "speaker_diarization", out)
@@ -63,7 +64,9 @@ class SeparatorePyannote:
         gc.collect()
         with contextlib.suppress(Exception):  # best effort
             import torch
-            if torch.backends.mps.is_available():
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            elif torch.backends.mps.is_available():
                 torch.mps.empty_cache()
 
     def stato(self) -> dict:

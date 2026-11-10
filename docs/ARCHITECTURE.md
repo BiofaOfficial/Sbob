@@ -16,7 +16,7 @@ browser ──HTTP 127.0.0.1──▶ FastAPI (sbob/api.py) ──▶ SQLite (sb
 | `sbob/__main__.py` | CLI: start the server and open the browser, or `check` the real engines |
 | `sbob/api.py` | REST API, local-only guard (Host/Origin), static frontend |
 | `sbob/db.py` | SQLite schema, migrations via `PRAGMA user_version`, one connection per operation |
-| `sbob/worker.py` | Job queue: one phase at a time, resume after restart, per-phase timeout, `caffeinate` |
+| `sbob/worker.py` | Job queue: one phase at a time, resume after restart, per-phase timeout, sleep inhibition (`caffeinate`, `systemd-inhibit`) |
 | `sbob/pipeline/fasi.py` | The phases, their dependency graph and execution |
 | `sbob/pipeline/acquisizione.py` | yt-dlp download, ffmpeg audio preparation |
 | `sbob/pipeline/mapreduce.py` | Splits the transcript in ~1300-word blocks and reduces notes within the context budget |
@@ -44,7 +44,8 @@ acquisizione → audio → trascrizione → voci → note ─┬─ prodotto
 ## Engines
 
 `engines.crea()` picks the set at startup: `mac` (mlx-whisper, pyannote, Ollama) on Apple Silicon,
-`fake` elsewhere and in tests (`SBOB_MOTORI=fake`). Adding a platform means adding an engine set,
+`linux` (faster-whisper on CUDA or CPU, pyannote, Ollama) when faster-whisper is installed, `fake`
+elsewhere and in tests (`SBOB_MOTORI=fake`). GPU engines fall back to the CPU when the GPU fails. Adding a platform means adding an engine set,
 not touching the pipeline.
 
 ## Data

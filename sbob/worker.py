@@ -5,6 +5,8 @@ import asyncio
 import contextlib
 import logging
 import os
+import shutil
+import signal
 import subprocess
 import sys
 
@@ -15,21 +17,37 @@ log = logging.getLogger("sbob.worker")
 
 
 class Caffeinate:
-    """Il Mac non va in stop durante un lavoro, e solo durante un lavoro."""
+    """Il computer non va in stop durante un lavoro, e solo durante un lavoro.
+
+    Mac: caffeinate. Linux: systemd-inhibit, se c'è; tiene il blocco finché vive Sbob o finché lo si ferma.
+    """
 
     def __init__(self):
         self._p: subprocess.Popen | None = None
 
     def avvia(self):
-        if sys.platform == "darwin" and self._p is None:
-            try:
-                self._p = subprocess.Popen(["caffeinate", "-i", "-w", str(os.getpid())])
-            except OSError:
-                self._p = None
+        if self._p is not None:
+            return
+        pid = str(os.getpid())
+        if sys.platform == "darwin":
+            comando = ["caffeinate", "-i", "-w", pid]
+        elif sys.platform.startswith("linux") and shutil.which("systemd-inhibit"):
+            comando = ["systemd-inhibit", "--what=idle:sleep", "--who=Sbob", "--why=Lavoro in corso",
+                       "tail", "--pid", pid, "-f", "/dev/null"]
+        else:
+            return
+        try:
+            self._p = subprocess.Popen(comando, start_new_session=True,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except OSError:
+            self._p = None
 
     def ferma(self):
         if self._p is not None:
-            self._p.terminate()
+            try:
+                os.killpg(self._p.pid, signal.SIGTERM)  # anche il processo figlio di systemd-inhibit
+            except OSError:
+                self._p.terminate()
             self._p = None
 
 

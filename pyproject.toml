@@ -10,6 +10,7 @@ keywords = ["transcription", "whisper", "ollama", "study", "local-first"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3.11",
   "Topic :: Education",
   "Topic :: Multimedia :: Sound/Audio :: Speech",
@@ -28,6 +29,7 @@ dependencies = [
 
 [project.optional-dependencies]
 mac = ["mlx-whisper>=0.4"]
+linux = ["faster-whisper>=1.1"]
 voci = ["pyannote.audio>=3.3", "torch>=2.3"]
 dev = ["pytest>=8"]
 

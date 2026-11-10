@@ -6,6 +6,7 @@ Hugging Face vive solo in ~/Sbob/config.toml, mai nel repo.
 from __future__ import annotations
 
 import contextlib
+import importlib.util
 import os
 import platform
 import sys
@@ -14,14 +15,22 @@ from pathlib import Path
 
 import tomli_w
 
+WHISPER_MAC = "mlx-community/whisper-large-v3-turbo"
+WHISPER_LINUX = "large-v3-turbo"  # nome faster-whisper
+
+
+def _linux() -> bool:
+    return sys.platform.startswith("linux")
+
+
 DEFAULTS: dict = {
     "lingua_ui": "",  # "" = la suggerisce il browser
-    "whisper_modello": "mlx-community/whisper-large-v3-turbo",
+    "whisper_modello": WHISPER_LINUX if _linux() else WHISPER_MAC,
     "llm_modello": "qwen2.5:14b",
     "llm_ctx": 16384,
     "ollama_url": "http://127.0.0.1:11434",
     "porta": 8765,
-    "motori": "auto",  # auto | mac | fake
+    "motori": "auto",  # auto | mac | linux | fake
     "hf_token": "",
     "vocabolario_globale": "",  # termini attesi validi per tutti i lavori
     "timeout_fase_s": 4 * 3600,
@@ -61,4 +70,6 @@ def motori_effettivi(cfg: dict) -> str:
         return m
     if sys.platform == "darwin" and platform.machine() == "arm64":
         return "mac"
+    if _linux() and importlib.util.find_spec("faster_whisper") is not None:
+        return "linux"
     return "fake"

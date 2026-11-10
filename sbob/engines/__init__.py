@@ -28,4 +28,14 @@ def crea(cfg: dict, nome: str) -> Motori:
             SeparatorePyannote(lambda: cfg.get("hf_token", "")),
             LLMOllama(cfg["ollama_url"], cfg["llm_modello"], int(cfg["llm_ctx"])),
         )
+    if nome == "linux":
+        from .faster_whisper import TrascrittoreFW
+        from .ollama import LLMOllama
+        from .pyannote import SeparatorePyannote
+        return Motori(
+            "linux",
+            TrascrittoreFW(cfg["whisper_modello"]),
+            SeparatorePyannote(lambda: cfg.get("hf_token", "")),
+            LLMOllama(cfg["ollama_url"], cfg["llm_modello"], int(cfg["llm_ctx"])),
+        )
     raise ValueError(f"Motori sconosciuti: {nome}")
