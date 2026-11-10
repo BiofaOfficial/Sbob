@@ -1,0 +1,27 @@
+# segreti: mai nel repo
+.env
+*.hf_token
+.hf_token
+config.toml
+# ambienti e build
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+frontend/dist/
+.pytest_cache/
+.DS_Store
+.ruff_cache/
+dist/
+*.egg-info/
+# dati e log locali
+*.db
+*.db-wal
+*.db-shm
+*.log
+*.zip
+# editor
+.idea/
+.vscode/
+# materiale privato: mai nel repo
+_privato/
